@@ -9,6 +9,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_loclizations.dart';
 
 class PieChartView extends HookWidget {
   final Map<Category?, double> data;
@@ -213,7 +214,7 @@ class BarChartView extends HookWidget {
                   tooltipBgColor: Colors.black,
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     return BarTooltipItem(
-                        'income: ' +
+                        AppLocalizations.of(context)!.incomeTitle +
                             group.barRods.first.y.toStringAsFixed(1) +
                             '\n',
                         TextStyle(
@@ -223,7 +224,7 @@ class BarChartView extends HookWidget {
                         ),
                         children: <TextSpan>[
                           TextSpan(
-                            text: 'expense: ' +
+                            text: AppLocalizations.of(context)!.expenseTitle +
                                 group.barRods.last.y.toStringAsFixed(1),
                             style: TextStyle(
                               color: Colors.red,

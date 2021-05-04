@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
-final appLocale = StateProvider<Locale>((ref)=>Locale('es'));
+final appLocale = StateProvider<Locale>((ref)=>Locale('en'));
 
 final localeProvider = StateNotifierProvider<LocaleNotifier>(
     (ref) => LocaleNotifier(ref.watch(appLocale).state));

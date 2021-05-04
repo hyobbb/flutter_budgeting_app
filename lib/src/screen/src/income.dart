@@ -69,16 +69,16 @@ class IncomeScreen extends HookWidget {
               return PieChartView(items);
             }
           } else {
-            return const Center(child: Text('No data'));
+            return const Center(child: Text(AppLocalizations.of(context)!.noData));
           }
         },
       ),
       drawer: const AppDrawer(),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'List'),
+          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: AppLocalizations.of(context)!.list),
           BottomNavigationBarItem(
-              icon: Icon(Icons.pie_chart), label: 'By Category'),
+              icon: Icon(Icons.pie_chart), label: AppLocalizations.of(context)!.category),
         ],
         currentIndex: navigationIndex.value,
         onTap: (index) => navigationIndex.value = index,

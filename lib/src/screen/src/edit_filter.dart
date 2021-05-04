@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:budgeting/src/providers/providers.dart';
+import 'package:flutter_gen/gen_l10n/app_loclizations.dart';
 
 final _currentFilter = StateNotifierProvider.autoDispose
     .family<FilterNotifier, BudgetType?>((ref, type) {
@@ -34,7 +35,7 @@ class EditFilter extends HookWidget {
       appBar: AppBar(
         title: Align(
           alignment: Alignment.centerLeft,
-          child: Text('Apply Filter'),
+          child: Text(AppLocalizations.of(context)!.editFilter),
         ),
         actions: [
           IconButton(
@@ -43,13 +44,13 @@ class EditFilter extends HookWidget {
               showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
-                  content: Text('Are you sure to reset all filter?'),
+                  content: Text(AppLocalizations.of(context)!.confirmReset),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text('CANCEL'),
+                      child: Text(AppLocalizations.of(context)!.cancel),
                     ),
                     TextButton(
                       onPressed: () async {
@@ -142,7 +143,7 @@ class EditFilter extends HookWidget {
             return ListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(
-                'Category',
+               AppLocalizations.of(context)!.category,
                 style: Theme.of(context)
                     .textTheme
                     .headline5
@@ -160,7 +161,7 @@ class EditFilter extends HookWidget {
           final category = categories[index - 1];
           final isChecked = useState<bool>(provider.included(category));
           return ListTile(
-            title: Text(category?.name ?? 'etc'),
+            title: Text(category?.name ?? 'Etc'),
             leading: Checkbox(
               value: isChecked.value,
               onChanged: (checked) {
@@ -190,7 +191,7 @@ class EditFilter extends HookWidget {
         ListTile(
           contentPadding: EdgeInsets.zero,
           title: Text(
-            'Cash',
+            AppLocalizations.of(context)!.cash,
             style: Theme.of(context)
                 .textTheme
                 .headline5
@@ -218,7 +219,7 @@ class EditFilter extends HookWidget {
                     : 1);
             return Column(children: [
               ListTile(
-                title: Text('Cash'),
+                title: Text(AppLocalizations.of(context)!.cash),
                 leading: Radio<int>(
                   value: 0,
                   groupValue: index.value,
@@ -231,7 +232,7 @@ class EditFilter extends HookWidget {
                 ),
               ),
               ListTile(
-                title: Text('Credit Card'),
+                title: Text(AppLocalizations.of(context)!.card),
                 leading: Radio<int>(
                   value: 1,
                   groupValue: index.value,

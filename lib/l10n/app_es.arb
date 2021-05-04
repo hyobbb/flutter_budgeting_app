@@ -1,9 +1,27 @@
 {
   "appTitle": "Finanzas",
-  "@appTitle": {
-    "description": "app title"
-  },
   "homeTitle": "Neto Mensual",
-  "expenseTitle" : "Gastos",
-  "incomeTitle" : "Ingresos"
+  "incomeTitle": "Ingresos",
+
+  "editIncome": "Editar el ingreso",
+  "editExpense": "Editar el gasto",
+  "cancel": "Cancelar",
+  "confirmDelete": "Estas segur@ de borrar el dato?",
+  "invalidParameter": "Rellena toda informacion correctamente",
+  "titleHint": "Pon el titulo",
+  "cashHint": "Checalo si gastaste en efectivo",
+
+  "editFilter" : "Applicar el filtro",
+  "confirmReset" : "Estas segur@ de reiniciar el filtro?",
+  "category" : "categoria",
+  "cash" : "Efectivo",
+  "card" : "Tarjeta Credito",
+
+  "preference" : "Preferencia",
+  "english" : "Ingles",
+  "spanish" : "Espanol",
+
+  "expenseTitle": "Gastos",
+  "noData" : "No Dato",
+  "list" : "Lista"
 }

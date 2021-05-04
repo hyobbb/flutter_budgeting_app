@@ -26,7 +26,7 @@ class CategoryTag extends HookWidget {
           ),
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-          child: Text(category?.name ?? 'etc',
+          child: Text(category?.name ?? 'Etc',
             style: Theme.of(context).textTheme.bodyText1,
             overflow: TextOverflow.ellipsis,
           ),

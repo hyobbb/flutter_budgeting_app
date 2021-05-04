@@ -4,6 +4,91 @@
     "description": "app title"
   },
   "homeTitle": "Monthly Balance",
+  "@homeTitle": {
+    "description": ""
+  },
+  "incomeTitle" : "Income",
+  "@incomeTitle": {
+    "description": ""
+  },
+
+  "editIncome" : "Edit Income",
+  "@editIncome": {
+    "description": ""
+  },
+  "editExpense" : "Edit Expense",
+  "@editExpense": {
+    "description": ""
+  },
+  "cancel" : "Cancel",
+  "@cancel": {
+    "description": ""
+  },
+  "confirmDelete" : "Are you sure to delete?",
+  "@confirmDelete": {
+    "description": ""
+  },
+  "invalidParameter" : "Fill in whole forms correctly",
+  "@invalidParameter": {
+    "description": ""
+  },
+  "titleHint" : "Enter a title",
+  "@titleHint": {
+    "description": ""
+  },
+  "cashHint" : "Check if you used cash",
+  "@cashHint": {
+    "description": ""
+  },
+
+
+  "editFilter" : "Apply Filter",
+  "@editFilter": {
+    "description": ""
+  },
+  "confirmReset" : "Are you sure to reset filter?",
+  "@confirmReset": {
+    "description": ""
+  },
+  "category" : "Category",
+  "@category": {
+    "description": ""
+  },
+  "cash" : "Cash",
+  "@cash": {
+    "description": ""
+  },
+  "card" : "Credit Card",
+  "@card": {
+    "description": ""
+  },
+
+  "preference" : "Credit Card",
+  "@preference": {
+    "description": ""
+  },
+  "english" : "English",
+  "@english": {
+    "description": ""
+  },
+  "spanish" : "Spanish",
+  "@spanish": {
+    "description": ""
+  },
+
+
   "expenseTitle" : "Expense",
-  "incomeTitle" : "Income"
+  "@expenseTitle": {
+    "description": ""
+  },
+  "noData" : "No Data",
+  "@noData": {
+    "description": ""
+  },
+  "list" : "List",
+  "@list": {
+    "description": ""
+  }
+
+
 }

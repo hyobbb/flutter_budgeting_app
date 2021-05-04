@@ -8,6 +8,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:budgeting/src/providers/providers.dart';
+import 'package:flutter_gen/gen_l10n/app_loclizations.dart';
 
 class ExpenseScreen extends HookWidget {
   static const String route = '/expense';
@@ -19,7 +20,7 @@ class ExpenseScreen extends HookWidget {
       appBar: AppBar(
         title: Align(
           alignment: Alignment.centerLeft,
-          child: const Text('Expense'),
+          child: Text(AppLocalizations.of(context)!.expenseTitle),
         ),
         actions: [
           IconButton(
@@ -74,28 +75,28 @@ class ExpenseScreen extends HookWidget {
                   BudgetFunction.groupByCashUse(data).map((key, value) {
                 Category category;
                 if (key == null || key) {
-                  category = Category(name: 'Cash', color: Colors.blue.value);
+                  category = Category(name: AppLocalizations.of(context)!.cash, color: Colors.blue.value);
                 } else {
                   category =
-                      Category(name: 'Credit Card', color: Colors.red.value);
+                      Category(name: AppLocalizations.of(context)!.card, color: Colors.red.value);
                 }
                 return MapEntry(category, BudgetFunction.sum(value));
               });
               return PieChartView(items);
             }
           } else {
-            return const Center(child: Text('No data'));
+            return const Center(child: Text(AppLocalizations.of(context)!.noData));
           }
         },
       ),
       drawer: const AppDrawer(),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'List'),
+          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: AppLocalizations.of(context)!.list),
           BottomNavigationBarItem(
-              icon: Icon(Icons.pie_chart), label: 'By Category'),
+              icon: Icon(Icons.pie_chart), label: AppLocalizations.of(context)!.category),
           BottomNavigationBarItem(
-              icon: Icon(Icons.pie_chart), label: 'By Cash Use'),
+              icon: Icon(Icons.pie_chart), label: AppLocalizations.of(context)!.cash),
         ],
         currentIndex: navigationIndex.value,
         onTap: (index) => navigationIndex.value = index,

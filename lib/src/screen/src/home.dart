@@ -8,6 +8,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:budgeting/src/providers/providers.dart';
+import 'package:flutter_gen/gen_l10n/app_loclizations.dart';
 
 class HomeScreen extends HookWidget {
   static const String route = '/';
@@ -18,7 +19,7 @@ class HomeScreen extends HookWidget {
         appBar: AppBar(
           title: Align(
             alignment: Alignment.centerLeft,
-            child: const Text('Balance'),
+            child: Text(AppLocalizations.of(context)!.homeTitle),
           ),
         ),
         body: HookBuilder(
@@ -40,8 +41,8 @@ class HomeScreen extends HookWidget {
                         income: BudgetFunction.sum(incomes!),
                         expense: BudgetFunction.sum(expenses!),
                       ),
-                      const Text(
-                        'Monthly Balance',
+                      Text(
+                        AppLocalizations.of(context)!.homeTitle,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 27,
@@ -71,7 +72,7 @@ class HomeScreen extends HookWidget {
                 ),
               );
             } else {
-              return const Center(child: Text('No data'));
+              return const Center(child: Text(AppLocalizations.of(context)!.noData));
             }
           },
         ),

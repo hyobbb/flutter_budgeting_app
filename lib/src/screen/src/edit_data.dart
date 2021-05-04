@@ -1,5 +1,5 @@
 import 'package:budgeting/src/model/model.dart';
-import 'package:budgeting/src/screen/src/search_category.dart';
+import 'package:budgeting/src/widget/src/search_category.dart';
 import 'package:budgeting/src/service/date_handler.dart';
 import 'package:budgeting/src/widget/src/category_tag.dart';
 import 'package:budgeting/src/widget/widgets.dart';
@@ -7,6 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:budgeting/src/providers/providers.dart';
+import 'package:flutter_gen/gen_l10n/app_loclizations.dart';
 
 class EditData extends HookWidget {
   final BudgetData data;
@@ -28,10 +29,11 @@ class EditData extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: Align(
-            alignment: Alignment.centerLeft,
-            child: data.type == BudgetType.Expense
-                ? const Text('Edit Expense')
-                : const Text('Edit Income')),
+          alignment: Alignment.centerLeft,
+          child: data.type == BudgetType.Expense
+              ? Text(AppLocalizations.of(context)!.editExpense)
+              : Text(AppLocalizations.of(context)!.editIncome),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_forever_outlined),
@@ -40,13 +42,13 @@ class EditData extends HookWidget {
                 showDialog(
                   context: context,
                   builder: (_) => AlertDialog(
-                    content: const Text('Are you sure to delete this data?'),
+                    content: Text(AppLocalizations.of(context)!.confirmDelete),
                     actions: [
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text('CANCEL'),
+                        child: Text(AppLocalizations.of(context)!.cancel),
                       ),
                       TextButton(
                         onPressed: () async {
@@ -70,7 +72,7 @@ class EditData extends HookWidget {
                 Navigator.pop(context);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Fill in the forms correctly')));
+                    SnackBar(content: Text(AppLocalizations.of(context)!.invalidParameter)));
               }
             },
           )
@@ -110,7 +112,7 @@ class EditData extends HookWidget {
             child: TextField(
                 controller: controller,
                 decoration: InputDecoration(
-                    hintText: 'Enter a title', border: InputBorder.none),
+                    hintText: AppLocalizations.of(context)!.titleHint, border: InputBorder.none),
                 style: Theme.of(context).textTheme.headline5,
                 onSubmitted: (_) => FocusScope.of(context).nextFocus(),
                 onChanged: (title) =>
@@ -133,8 +135,9 @@ class EditData extends HookWidget {
           Expanded(
             child: TextField(
               controller: controller,
-              decoration:
-                  InputDecoration(hintText: '0.00', border: InputBorder.none),
+              decoration: InputDecoration(
+                  hintText: context.read(localeProvider).printIncome(0.00),
+                  border: InputBorder.none),
               keyboardType: TextInputType.number,
               style: Theme.of(context).textTheme.headline5,
               onSubmitted: (_) => FocusScope.of(context).unfocus(),
@@ -242,7 +245,7 @@ class EditData extends HookWidget {
                   }
                 },
               ),
-              const Text('Check if you paid with cash')
+              Text(AppLocalizations.of(context)!.cashHint)
             ],
           ),
         ],

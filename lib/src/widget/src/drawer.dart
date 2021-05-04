@@ -2,6 +2,7 @@ import 'package:budgeting/src/screen/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_loclizations.dart';
 
 final _route = StateProvider<String>((ref) => '/');
 
@@ -24,12 +25,12 @@ class AppDrawer extends HookWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
             ),
-            child: const Text('Simple Budegting'),
+            child: Text(AppLocalizations.of(context)!.appTitle),
           ),
           ListTile(
             selected: route.state == HomeScreen.route,
-            leading: const Icon(Icons.attach_money),
-            title: const Text('Home'),
+            leading: const Icon(Icons.account_balance),
+            title: Text(AppLocalizations.of(context)!.homeTitle),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, HomeScreen.route);
@@ -39,7 +40,7 @@ class AppDrawer extends HookWidget {
           ListTile(
             selected: route.state == IncomeScreen.route,
             leading: const Icon(Icons.attach_money),
-            title: const Text('Income'),
+            title: Text(AppLocalizations.of(context)!.incomeTitle),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, IncomeScreen.route);
@@ -49,7 +50,7 @@ class AppDrawer extends HookWidget {
           ListTile(
             selected: route.state == ExpenseScreen.route,
             leading: const Icon(Icons.attach_money),
-            title: const Text('Expense'),
+            title: Text(AppLocalizations.of(context)!.expenseTitle),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, ExpenseScreen.route);
@@ -59,7 +60,7 @@ class AppDrawer extends HookWidget {
           ListTile(
             selected: route.state == Preference.route,
             leading: const Icon(Icons.language),
-            title: const Text('Language'),
+            title: Text(AppLocalizations.of(context)!.preference),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, Preference.route);

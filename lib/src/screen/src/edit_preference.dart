@@ -6,6 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:budgeting/src/providers/providers.dart';
+import 'package:flutter_gen/gen_l10n/app_loclizations.dart';
 
 class Preference extends HookWidget {
   static const String route = '/preference';
@@ -20,7 +21,7 @@ class Preference extends HookWidget {
       appBar: AppBar(
         title: Align(
           alignment: Alignment.centerLeft,
-          child: Text('Preference'),
+          child: Text(AppLocalizations.of(context)!.preference),
         ),
         actions: [
           IconButton(
@@ -37,7 +38,7 @@ class Preference extends HookWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
-              title: Text('English'),
+              title: Text(AppLocalizations.of(context)!.english),
               leading: Radio<int>(
                 value: 0,
                 groupValue: index.value,
@@ -50,7 +51,7 @@ class Preference extends HookWidget {
               ),
             ),
             ListTile(
-              title: Text('Spanish'),
+              title: Text(AppLocalizations.of(context)!.spanish),
               leading: Radio<int>(
                 value: 1,
                 groupValue: index.value,
