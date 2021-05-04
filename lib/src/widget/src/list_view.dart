@@ -1,4 +1,5 @@
 import 'package:budgeting/src/model/model.dart';
+import 'package:budgeting/src/providers/src/locale_provider.dart';
 import 'package:budgeting/src/screen/screens.dart';
 import 'package:budgeting/src/service/budget_function.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,6 +18,7 @@ class BudgetListView extends HookWidget {
   Widget build(BuildContext context) {
     final start = data.first.date.year;
     final end = data.last.date.year;
+    final locale = useProvider(localeProvider);
     return ListView(
       children: List.generate(
         end - start + 1,
@@ -38,7 +40,9 @@ class BudgetListView extends HookWidget {
                   ),
                 ),
                 Text(
-                  sum.toString() + ' ‎€',
+                  data.first.type == BudgetType.Income
+                      ? locale.printIncome(sum)
+                      : locale.printExpense(sum),
                   style: Theme.of(context)
                       .textTheme
                       .headline6
@@ -65,6 +69,7 @@ class BudgetListView extends HookWidget {
 
   List<Widget> _makeMonthTile(List<BudgetData> data, int year) {
     final context = useContext();
+    final locale = useProvider(localeProvider);
     return List.generate(
       12,
       (index) {
@@ -85,7 +90,9 @@ class BudgetListView extends HookWidget {
                   ),
                 ),
                 Text(
-                  sum.toString() + ' ‎€',
+                  data.first.type == BudgetType.Income
+                      ? locale.printIncome(sum)
+                      : locale.printExpense(sum),
                   style: Theme.of(context).textTheme.subtitle1?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -124,11 +131,11 @@ class BudgetTile extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final data = useProvider(_scoped);
-    final date = data.date;
+    final locale = useProvider(localeProvider);
     return ListTile(
       leading: CircleAvatar(
         child: Text(
-          date.day.toString(),
+          data.date.day.toString(),
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -149,7 +156,11 @@ class BudgetTile extends HookWidget {
                 ? Icon(Icons.monetization_on_outlined)
                 : Icon(Icons.credit_card),
           const SizedBox(width: 5),
-          Text(data.value.toString() + ' ‎€'),
+          Text(
+            (data.type == BudgetType.Income)
+                ? locale.printIncome(data.value)
+                : locale.printExpense(data.value),
+          ),
         ],
       ),
       subtitle: Padding(

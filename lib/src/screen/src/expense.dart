@@ -31,7 +31,7 @@ class ExpenseScreen extends HookWidget {
                 arguments: BudgetData(
                   type: BudgetType.Expense,
                   date: DateTime.now(),
-                  cash: true,
+                  cash: false,
                   title: '',
                   value: 0.0,
                 ),

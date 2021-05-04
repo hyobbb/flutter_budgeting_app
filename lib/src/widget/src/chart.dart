@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:budgeting/src/model/model.dart';
+import 'package:budgeting/src/providers/src/locale_provider.dart';
 import 'package:budgeting/src/service/budget_function.dart';
 import 'package:budgeting/src/service/date_handler.dart';
 import 'package:budgeting/src/widget/widgets.dart';
@@ -7,6 +8,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PieChartView extends HookWidget {
   final Map<Category?, double> data;
@@ -112,7 +114,7 @@ class PieChartView extends HookWidget {
   }
 }
 
-class BalanceBar extends StatelessWidget {
+class BalanceBar extends HookWidget {
   final double income;
   final double expense;
   static const height = 15.0;
@@ -127,12 +129,13 @@ class BalanceBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final totalSum = income + expense;
     final balance = income - expense;
+    final locale = useProvider(localeProvider);
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         children: [
           Text(
-            'Total Balance: ' + (balance).toString() + ' ‎€',
+            'Total Balance: ' + locale.printIncome(balance),
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,

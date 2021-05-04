@@ -56,6 +56,16 @@ class AppDrawer extends HookWidget {
               route.state = ExpenseScreen.route;
             },
           ),
+          ListTile(
+            selected: route.state == Preference.route,
+            leading: const Icon(Icons.language),
+            title: const Text('Language'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, Preference.route);
+              route.state = Preference.route;
+            },
+          ),
         ],
       ),
     );

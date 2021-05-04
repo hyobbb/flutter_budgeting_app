@@ -1,0 +1,9 @@
+{
+  "appTitle": "Simple Budgeting",
+  "@appTitle": {
+    "description": "app title"
+  },
+  "homeTitle": "Monthly Balance",
+  "expenseTitle" : "Expense",
+  "incomeTitle" : "Income"
+}

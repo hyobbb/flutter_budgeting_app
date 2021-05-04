@@ -1,0 +1,9 @@
+{
+  "appTitle": "Finanzas",
+  "@appTitle": {
+    "description": "app title"
+  },
+  "homeTitle": "Neto Mensual",
+  "expenseTitle" : "Gastos",
+  "incomeTitle" : "Ingresos"
+}
