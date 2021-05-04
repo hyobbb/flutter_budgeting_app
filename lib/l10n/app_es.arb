@@ -1,27 +1,27 @@
 {
   "appTitle": "Finanzas",
-  "homeTitle": "Neto Mensual",
+  "homeTitle": "Balance mensual",
   "incomeTitle": "Ingresos",
 
-  "editIncome": "Editar el ingreso",
-  "editExpense": "Editar el gasto",
+  "editIncome": "Editar ingresos",
+  "editExpense": "Editar gastos",
   "cancel": "Cancelar",
-  "confirmDelete": "Estas segur@ de borrar el dato?",
-  "invalidParameter": "Rellena toda informacion correctamente",
-  "titleHint": "Pon el titulo",
-  "cashHint": "Checalo si gastaste en efectivo",
+  "confirmDelete": "¿Seguro que quieres eliminar?",
+  "invalidParameter": "Dato incorrecto",
+  "titleHint": "Rellene el título",
+  "cashHint": "Pago en efectivo",
 
-  "editFilter" : "Applicar el filtro",
-  "confirmReset" : "Estas segur@ de reiniciar el filtro?",
-  "category" : "categoria",
+  "editFilter" : "Aplicar filtro",
+  "confirmReset" : "¿Eliminar el filtro?",
+  "category" : "Categoría",
   "cash" : "Efectivo",
-  "card" : "Tarjeta Credito",
+  "card" : "Tarjeta",
 
   "preference" : "Preferencia",
-  "english" : "Ingles",
-  "spanish" : "Espanol",
+  "english" : "Inglés",
+  "spanish" : "Español",
 
   "expenseTitle": "Gastos",
-  "noData" : "No Dato",
+  "noData" : "Sin datos",
   "list" : "Lista"
 }
