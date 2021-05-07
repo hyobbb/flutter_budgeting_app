@@ -63,7 +63,7 @@
     "description": ""
   },
 
-  "preference" : "Credit Card",
+  "preference" : "Preference",
   "@preference": {
     "description": ""
   },

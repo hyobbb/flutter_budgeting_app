@@ -9,7 +9,11 @@ final localeProvider = StateNotifierProvider<LocaleNotifier>(
 
 class LocaleNotifier extends StateNotifier<Locale> {
   LocaleNotifier(Locale state) : super(state) {
-    moneyFormat = NumberFormat.simpleCurrency();
+    if(state.languageCode == 'en'){
+      moneyFormat = NumberFormat.simpleCurrency(locale: 'en_US');
+    } else {
+      moneyFormat = NumberFormat.simpleCurrency(locale: 'es_ES');
+    }
   }
 
   late final NumberFormat moneyFormat;

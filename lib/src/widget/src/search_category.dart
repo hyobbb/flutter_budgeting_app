@@ -127,7 +127,7 @@ class SearchCategory extends HookWidget {
                         CategoryTag(
                           category.value,
                           onTap: (cat) async {
-                            if (cat != null) {
+                            if (cat != null && cat.name.isNotEmpty) {
                               onCreated(cat);
                               Navigator.pop(context);
                             }
@@ -164,19 +164,32 @@ class ColorPicker extends StatefulWidget {
 
 class _ColorPickerState extends State<ColorPicker> {
   final List<Color> _colors = [
-    Color.fromARGB(255, 255, 0, 0),
-    Color.fromARGB(255, 255, 128, 0),
-    Color.fromARGB(255, 255, 255, 0),
-    Color.fromARGB(255, 255, 255, 0),
-    Color.fromARGB(255, 128, 255, 0),
-    Color.fromARGB(255, 0, 255, 0),
-    Color.fromARGB(255, 0, 255, 128),
-    Color.fromARGB(255, 0, 255, 255),
-    Color.fromARGB(255, 0, 128, 255),
-    Color.fromARGB(255, 0, 0, 255),
-    Color.fromARGB(255, 128, 0, 255),
-    Color.fromARGB(255, 255, 0, 255),
-    Color.fromARGB(255, 255, 0, 128)
+    Color.fromARGB(153, 255, 0, 0),
+    Color.fromARGB(153, 255, 128, 0),
+    Color.fromARGB(153, 255, 255, 0),
+    Color.fromARGB(153, 255, 255, 0),
+    Color.fromARGB(153, 128, 255, 0),
+    Color.fromARGB(153, 0, 255, 0),
+    Color.fromARGB(153, 0, 255, 128),
+    Color.fromARGB(153, 0, 255, 255),
+    Color.fromARGB(153, 0, 128, 255),
+    Color.fromARGB(153, 0, 0, 255),
+    Color.fromARGB(153, 128, 0, 255),
+    Color.fromARGB(153, 255, 0, 255),
+
+    // Color.fromARGB(255, 255, 0, 0),
+    // Color.fromARGB(255, 255, 128, 0),
+    // Color.fromARGB(255, 255, 255, 0),
+    // Color.fromARGB(255, 255, 255, 0),
+    // Color.fromARGB(255, 128, 255, 0),
+    // Color.fromARGB(255, 0, 255, 0),
+    // Color.fromARGB(255, 0, 255, 128),
+    // Color.fromARGB(255, 0, 255, 255),
+    // Color.fromARGB(255, 0, 128, 255),
+    // Color.fromARGB(255, 0, 0, 255),
+    // Color.fromARGB(255, 128, 0, 255),
+    // Color.fromARGB(255, 255, 0, 255),
+    // Color.fromARGB(255, 255, 0, 128)
   ];
 
   double _width = 0.0;

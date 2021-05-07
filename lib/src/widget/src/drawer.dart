@@ -59,7 +59,7 @@ class AppDrawer extends HookWidget {
           ),
           ListTile(
             selected: route.state == Preference.route,
-            leading: const Icon(Icons.language),
+            leading: const Icon(Icons.settings),
             title: Text(AppLocalizations.of(context)!.preference),
             onTap: () {
               Navigator.pop(context);

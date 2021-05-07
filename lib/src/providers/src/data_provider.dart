@@ -13,21 +13,21 @@ final categoryListCache = StateNotifierProvider<CategoryListCache>((ref) {
       DatabaseAPI().categories.map((e) => Category.fromJson(e)).toList());
 });
 
-
 class BudgetListCache extends StateNotifier<List<BudgetData>> {
   BudgetListCache(List<BudgetData> state) : super(state);
 
   final api = DatabaseAPI();
-  static const table = 'data';
+  static const table = DatabaseAPI.budget;
 
   Future<void> update(BudgetData data) async {
     if (data.id == null) {
       await api
           .create(table: table, value: BudgetFunction.toJson(data))
           .then((value) => data = data.copyWith(id: value));
-      state = [...state, data]..sort((a, b) => a.date.compareTo(b.date));
+      state = [...state, data]..sort((a, b) => b.date.compareTo(a.date));
     } else {
-      await api.update(table: table, id: data.id!, value: BudgetFunction.toJson(data));
+      await api.update(
+          table: table, id: data.id!, value: BudgetFunction.toJson(data));
       state = state.map((e) => e.id == data.id ? data : e).toList();
     }
   }
@@ -49,12 +49,18 @@ class BudgetListCache extends StateNotifier<List<BudgetData>> {
       return e;
     }).toList();
   }
+
+  void onImportCsv() {
+    state = DatabaseAPI()
+        .budgetData
+        .map((e) => BudgetFunction.fromJson(e))
+        .toList();
+  }
 }
 
-
-class CategoryListCache extends StateNotifier<List<Category>>{
+class CategoryListCache extends StateNotifier<List<Category>> {
   final api = DatabaseAPI();
-  static const table = 'category';
+  static const table = DatabaseAPI.category;
 
   CategoryListCache(List<Category> state) : super(state);
 
@@ -77,5 +83,9 @@ class CategoryListCache extends StateNotifier<List<Category>>{
 
   Category getCategory(String name) {
     return state.firstWhere((element) => element.name == name);
+  }
+
+  void onImportCsv() {
+    state = DatabaseAPI().categories.map((e) => Category.fromJson(e)).toList();
   }
 }

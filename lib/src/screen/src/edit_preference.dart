@@ -2,6 +2,7 @@ import 'package:budgeting/src/model/model.dart';
 import 'package:budgeting/src/providers/src/locale_provider.dart';
 import 'package:budgeting/src/service/budget_function.dart';
 import 'package:budgeting/src/service/date_handler.dart';
+import 'package:budgeting/src/widget/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -23,14 +24,6 @@ class Preference extends HookWidget {
           alignment: Alignment.centerLeft,
           child: Text(AppLocalizations.of(context)!.preference),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.done),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          )
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
@@ -67,6 +60,7 @@ class Preference extends HookWidget {
           ],
         ),
       ),
+      drawer: const AppDrawer(),
     );
   }
 }

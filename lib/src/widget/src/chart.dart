@@ -276,7 +276,7 @@ class BarChartView extends HookWidget {
                       fontSize: 10),
                   margin: 40,
                   reservedSize: 10,
-                  interval: 100,
+                  interval: 200,
                   getTitles: (value) {
                     return '${value.toInt()}';
                   },

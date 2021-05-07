@@ -85,13 +85,13 @@ class ExpenseScreen extends HookWidget {
               return PieChartView(items);
             }
           } else {
-            return const Center(child: Text(AppLocalizations.of(context)!.noData));
+            return Center(child: Text(AppLocalizations.of(context)!.noData));
           }
         },
       ),
       drawer: const AppDrawer(),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: AppLocalizations.of(context)!.list),
           BottomNavigationBarItem(
               icon: Icon(Icons.pie_chart), label: AppLocalizations.of(context)!.category),

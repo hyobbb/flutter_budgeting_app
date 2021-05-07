@@ -16,14 +16,14 @@ class BudgetListView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final start = data.first.date.year;
-    final end = data.last.date.year;
+    final start = data.last.date.year;
+    final end = data.first.date.year;
     final locale = useProvider(localeProvider);
     return ListView(
       children: List.generate(
         end - start + 1,
         (index) {
-          final thisYear = start + index;
+          final thisYear = end - index;
           final dataOfThisYear =
               data.where((e) => e.date.year == thisYear).toList();
           final sum = BudgetFunction.sum(dataOfThisYear);
@@ -73,7 +73,7 @@ class BudgetListView extends HookWidget {
     return List.generate(
       12,
       (index) {
-        final thisMonth = 1 + index;
+        final thisMonth = 12 - index;
         final dataOfThisMonth =
             data.where((e) => e.date.month == thisMonth).toList();
         final sum = BudgetFunction.sum(dataOfThisMonth);

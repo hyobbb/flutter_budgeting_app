@@ -1,10 +1,17 @@
+import 'dart:io';
+import 'package:budgeting/src/model/model.dart';
+import 'package:budgeting/src/service/budget_function.dart';
+import 'package:budgeting/src/service/csv_util.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseAPI {
   late final Database _db;
-  late final List<Map<String, dynamic>> _budgetData;
-  late final List<Map<String, dynamic>> _categories;
+  List<Map<String, dynamic>> _budgetData = [];
+  List<Map<String, dynamic>> _categories = [];
+  static const budget = 'budget';
+  static const category = 'category';
 
   static final DatabaseAPI _singleton = DatabaseAPI._internal();
 
@@ -24,11 +31,11 @@ class DatabaseAPI {
     //await deleteDatabase(path);
     _db = await openDatabase(path, version: 1,
         onCreate: (database, version) async {
-      await database.execute('CREATE TABLE IF NOT EXISTS category ('
+      await database.execute('CREATE TABLE $category ('
           'id INTEGER PRIMARY KEY, '
           'name TEXT, '
           'color INTEGER)');
-      await database.execute('CREATE TABLE IF NOT EXISTS data ('
+      await database.execute('CREATE TABLE $budget ('
           'id INTEGER PRIMARY KEY, '
           'type TEXT, '
           'title TEXT, '
@@ -36,14 +43,14 @@ class DatabaseAPI {
           'value REAL, '
           'date INTEGER, '
           'cash INTEGER, '
-          'FOREIGN KEY(category_id) REFERENCES category(id))');
+          'FOREIGN KEY(category_id) REFERENCES $category(id))');
     }, onOpen: (database) async {
       _budgetData = await database.rawQuery(
-          'SELECT data.*, category.id as category_id, category.name, category.color '
-          'FROM data JOIN category '
-          'ON category.id = data.category_id '
-          'ORDER BY date ASC');
-      _categories = await database.rawQuery('SELECT * FROM category');
+          'SELECT $budget.*, $category.id as category_id, $category.name, $category.color '
+          'FROM $budget JOIN $category '
+          'ON $category.id = $budget.category_id '
+          'ORDER BY date DESC');
+      _categories = await database.rawQuery('SELECT * FROM $category');
     });
   }
 
@@ -86,5 +93,68 @@ class DatabaseAPI {
     required String sql,
   }) async {
     return await _db.rawQuery(sql).then((value) => value);
+  }
+
+  Future<File> budgetToCsv() async {
+    final data = await _db.rawQuery(
+        'SELECT $budget.*, $category.id as category_id, $category.name, $category.color '
+            'FROM $budget JOIN $category '
+            'ON $category.id = $budget.category_id '
+            'ORDER BY date DESC');
+
+    var csv = mapListToCsv(data) ?? '';
+    var dir = await getApplicationDocumentsDirectory();
+    var path = '${dir.path}/$budget.csv';
+    var file = File(path);
+    file = await file.writeAsString(csv);
+    return file;
+  }
+
+  Future<File> categoryToCsv() async {
+    final data = await _db.rawQuery('SELECT * FROM category');
+    var csv = mapListToCsv(data) ?? '';
+    var dir = await getApplicationDocumentsDirectory();
+    var path = '${dir.path}/$category.csv';
+    var file = File(path);
+    file = await file.writeAsString(csv);
+    return file;
+  }
+
+  Future<void> importCsv(File file) async {
+    final table = basenameWithoutExtension(file.path);
+    final csv = await file.readAsString();
+    final data = csvToMap(csv);
+
+    if (table == category) {
+      await writeBatchCategory(data);
+    } else {
+      await writeBatchBudget(data);
+    }
+  }
+
+  Future<void> writeBatchBudget(List<Map<String, dynamic>> data) async {
+    await _db.delete(budget);
+    final batch = _db.batch();
+    data
+        .map((e) => BudgetFunction.fromJson(e))
+        .forEach((e) => batch.insert(budget, BudgetFunction.toJson(e)));
+    await batch.commit(noResult: true);
+    _budgetData = await _db.rawQuery(
+        'SELECT $budget.*, $category.id as category_id, $category.name, $category.color '
+            'FROM $budget JOIN $category '
+            'ON $category.id = $budget.category_id '
+            'ORDER BY date DESC');
+  }
+
+  Future<void> writeBatchCategory(List<Map<String, dynamic>> data) async {
+    await _db.delete(category);
+    _categories = await _db.rawQuery('SELECT * FROM $category');
+
+    final batch = _db.batch();
+    data
+        .map((e) => Category.fromJson(e))
+        .forEach((cat) => batch.insert(category, cat.toJson()));
+    await batch.commit(noResult: true);
+    _categories = await _db.rawQuery('SELECT * FROM $category');
   }
 }

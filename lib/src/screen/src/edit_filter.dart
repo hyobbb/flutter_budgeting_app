@@ -94,7 +94,9 @@ class EditFilter extends HookWidget {
     final filter = useProvider(_currentFilter(type).state);
     final data = BudgetFunction.applyFilter(
         data: context.read(budgetListCache.state), filter: filter);
-    final start = filter.startDate ?? data.first.date;
+    final start = filter.startDate != null && data.isNotEmpty
+        ? data.last.date
+        : DateTime.now();
     final end = filter.endDate ?? DateTime.now();
     return ListTile(
       contentPadding: EdgeInsets.zero,
@@ -106,7 +108,7 @@ class EditFilter extends HookWidget {
                 start: start,
                 end: end,
               ),
-              firstDate: data.first.date,
+              firstDate: data.isNotEmpty ? data.last.date : DateTime.now(),
               lastDate: DateTime.now());
 
           if (selected != null) {
@@ -143,7 +145,7 @@ class EditFilter extends HookWidget {
             return ListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(
-               AppLocalizations.of(context)!.category,
+                AppLocalizations.of(context)!.category,
                 style: Theme.of(context)
                     .textTheme
                     .headline5
@@ -200,7 +202,7 @@ class EditFilter extends HookWidget {
           leading: Checkbox(
             value: enabled.value,
             onChanged: (checked) {
-              if(checked!=null){
+              if (checked != null) {
                 enabled.value = checked;
               }
 

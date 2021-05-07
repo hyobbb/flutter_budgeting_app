@@ -1,0 +1,4 @@
+id,type,title,category_id,value,date,cash,name,color
+3,expense,dentista,3,1000.0,20210423,0,hospital,4294923008
+1,income,salario,1,2000.0,20210430,null,work,4294967040
+2,expense,cervexa,2,10.0,20210507,0,alcohol,4284481791
