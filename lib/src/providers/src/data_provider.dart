@@ -19,6 +19,10 @@ class BudgetListCache extends StateNotifier<List<BudgetData>> {
   final api = DatabaseAPI();
   static const table = DatabaseAPI.budget;
 
+  DateTime get firstDate => state.isEmpty ? DateTime.now() : state.last.date;
+
+  DateTime get lastDate => state.isEmpty ? DateTime.now() : state.first.date;
+
   Future<void> update(BudgetData data) async {
     if (data.id == null) {
       await api
@@ -50,6 +54,19 @@ class BudgetListCache extends StateNotifier<List<BudgetData>> {
     }).toList();
   }
 
+  void onCategoryUpdated(Category category) {
+    state = state.map((e) {
+      if (e.category?.id == category.id) {
+        api.update(
+            table: table,
+            id: e.id!,
+            value: BudgetFunction.toJson(e.copyWith(category: category)));
+        return e.copyWith(category: category);
+      }
+      return e;
+    }).toList();
+  }
+
   void onImportCsv() {
     state = DatabaseAPI()
         .budgetData
@@ -64,16 +81,31 @@ class CategoryListCache extends StateNotifier<List<Category>> {
 
   CategoryListCache(List<Category> state) : super(state);
 
-  Future<void> update(Category category) async {
-    if (category.id == null) {
+  Future<bool> _sanityCheck(Category category) async {
+    if (category.id != null) {
+      return false;
+    }
+
+    final result = await api.read(
+        table: table, columnName: 'name', columnValue: category.name);
+
+    return result == null;
+  }
+
+  Future<Category> create(Category category) async {
+    if (await _sanityCheck(category)) {
       final newId = await api.create(table: table, value: category.toJson());
       category = category.copyWith(id: newId);
       state = [...state, category];
+      return category;
     } else {
-      await api.update(
-          table: table, id: category.id!, value: category.toJson());
-      state = state.map((e) => e.id == category.id ? category : e).toList();
+      throw Exception('This Category Is Already Exists');
     }
+  }
+
+  Future<void> update(Category category) async {
+    await api.update(table: table, id: category.id!, value: category.toJson());
+    state = state.map((e) => e.id == category.id ? category : e).toList();
   }
 
   Future<void> remove(int id) async {

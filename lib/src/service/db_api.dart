@@ -45,6 +45,19 @@ class DatabaseAPI {
           'cash INTEGER, '
           'FOREIGN KEY(category_id) REFERENCES $category(id))');
     }, onOpen: (database) async {
+          await database.execute('CREATE TABLE IF NOT EXISTS $category ('
+              'id INTEGER PRIMARY KEY, '
+              'name TEXT, '
+              'color INTEGER)');
+          await database.execute('CREATE TABLE IF NOT EXISTS $budget ('
+              'id INTEGER PRIMARY KEY, '
+              'type TEXT, '
+              'title TEXT, '
+              'category_id INTEGER, '
+              'value REAL, '
+              'date INTEGER, '
+              'cash INTEGER, '
+              'FOREIGN KEY(category_id) REFERENCES $category(id))');
       _budgetData = await database.rawQuery(
           'SELECT $budget.*, $category.id as category_id, $category.name, $category.color '
           'FROM $budget JOIN $category '

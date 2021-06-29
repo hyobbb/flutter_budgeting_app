@@ -5,31 +5,43 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:budgeting/src/providers/providers.dart';
-
+import 'dart:math';
 
 final filteredCategory = StateProvider.autoDispose
     .family<List<Category>, String?>((ref, keyword) => ref
-    .watch(categoryListCache.state)
-    .where((e) => (keyword == null || keyword.isEmpty)
-    ? true
-    : e.name.contains(keyword))
-    .toList());
-
+        .watch(categoryListCache.state)
+        .where((e) => (keyword == null || keyword.isEmpty)
+            ? true
+            : e.name.contains(keyword))
+        .toList());
 
 class SearchCategory extends HookWidget {
-  final ValueChanged<Category> onCreated;
-  final ValueChanged<Category?> onSelected;
-  final ValueChanged<Category> onDeleted;
+  final Category? initialCategory;
+
+  //optional callback on category removal
+  final ValueChanged<Category>? deleteCallback;
 
   const SearchCategory({
-    required this.onCreated,
-    required this.onSelected,
-    required this.onDeleted,
+    required this.initialCategory,
+    this.deleteCallback,
   });
 
   @override
   Widget build(BuildContext context) {
-    final category = useState<Category>(Category(name: ''));
+    final category = useState<Category>(initialCategory ??
+        Category(
+          name: '',
+          color: _generateColor(),
+        ));
+    final textController = useTextEditingController();
+    final shouldUpdate = useState(false);
+    useEffect(() {
+      textController.text = category.value.name;
+      textController.selection = TextSelection.fromPosition(
+        TextPosition(offset: textController.text.length),
+      );
+      return null;
+    }, [category.value]);
     return Center(
       child: Card(
         child: Padding(
@@ -37,6 +49,7 @@ class SearchCategory extends HookWidget {
           child: Column(
             children: [
               TextFormField(
+                controller: textController,
                 decoration: InputDecoration(
                   isDense: true,
                   contentPadding: const EdgeInsets.all(0.0),
@@ -45,76 +58,97 @@ class SearchCategory extends HookWidget {
                     iconSize: 20,
                     icon: Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.pop(context);
+                      if (shouldUpdate.value) {
+                        shouldUpdate.value = false;
+                        category.value = category.value
+                            .copyWith(name: '', color: _generateColor());
+                      } else {
+                        Navigator.pop(context);
+                      }
                     },
                   ),
                   hintText: 'Enter a category name',
                   border: InputBorder.none,
+                  suffixIcon: IconButton(
+                    onPressed: () => category.value = category.value
+                        .copyWith(name: '', color: _generateColor()),
+                    icon: Icon(Icons.cancel),
+                  ),
                 ),
                 autofocus: true,
+                maxLength: 20,
                 style: TextStyle(fontSize: 20),
+                textCapitalization: TextCapitalization.words,
                 onChanged: (name) {
                   category.value = category.value.copyWith(name: name);
                 },
                 onFieldSubmitted: (_) => primaryFocus?.unfocus(),
               ),
-              HookBuilder(builder: (_) {
-                final categories = useProvider(filteredCategory(category.value.name));
-                if (categories.state.isNotEmpty) {
+              HookBuilder(
+                builder: (_) {
+                  final categories =
+                      useProvider(filteredCategory(category.value.name));
+                  if (!shouldUpdate.value) {
                     return Expanded(
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         itemCount: categories.state.length + 1,
                         itemBuilder: (_, index) {
-                          if (index == 0) {
-                            return Container(
-                              height: 60,
-                              child: ListTile(
-                                leading: CategoryTag(
-                                  null,
-                                  onTap: (cat) {
-                                    onSelected(cat);
-                                    Navigator.pop(context);
-                                  },
+                          if (index == categories.state.length) {
+                            var idx = categories.state.indexWhere(
+                                (cat) => category.value.name == cat.name);
+                            if (idx == -1 && category.value.name.isNotEmpty) {
+                              return Container(
+                                height: 60,
+                                child: ListTile(
+                                  leading: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.fiber_new_outlined,
+                                        color: Colors.orange,
+                                      ),
+                                      CategoryTag(category.value),
+                                    ],
+                                  ),
+                                  onTap: () => shouldUpdate.value = true,
                                 ),
-                              ),
-                            );
+                              );
+                            } else {
+                              return Container();
+                            }
                           }
-                          final cat = categories.state[index - 1];
+
+                          final cat = categories.state[index];
                           return Container(
                             height: 60,
                             child: ListTile(
                               leading: CategoryTag(
                                 cat,
                                 onTap: (cat) {
-                                  onSelected(cat);
-                                  Navigator.pop(context);
+                                  Navigator.pop(context, cat);
                                 },
                               ),
-                              trailing: IconButton(
-                                icon: Icon(Icons.remove_circle_outline),
-                                onPressed: () => showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    content: Text(
-                                        'Are you sure to delete this category?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text('CANCEL'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () async {
-                                          onDeleted(cat);
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text('OK'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                              trailing: _CategoryOptionButton(
+                                onDelete: () async {
+                                  await context
+                                      .read(categoryListCache)
+                                      .remove(cat.id!);
+                                  context
+                                      .read(budgetListCache)
+                                      .onCategoryDeleted(cat.id!);
+
+                                  if (deleteCallback != null) {
+                                    deleteCallback!(cat);
+                                  }
+                                  //then close pop up entry
+                                  Navigator.pop(context);
+                                },
+                                onEdit: () async {
+                                  category.value = cat;
+                                  shouldUpdate.value = true;
+                                  Navigator.pop(context);
+                                },
                               ),
                             ),
                           );
@@ -123,21 +157,30 @@ class SearchCategory extends HookWidget {
                     );
                   } else {
                     return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         CategoryTag(
                           category.value,
-                          onTap: (cat) async {
-                            if (cat != null && cat.name.isNotEmpty) {
-                              onCreated(cat);
-                              Navigator.pop(context);
-                            }
-                          },
+                          onTap: (cat) => _onCreateOrUpdate(context, cat),
                         ),
+                        const SizedBox(height: 20),
                         ColorPicker(
                           onChangeColor: (col) {
                             category.value =
                                 category.value.copyWith(color: col.value);
                           },
+                        ),
+                        const SizedBox(height: 20),
+                        TextButton(
+                          onPressed: () => category.value =
+                              category.value.copyWith(color: _generateColor()),
+                          child: Row(
+                            children: [
+                              Icon(Icons.color_lens, color: Colors.black),
+                              const SizedBox(width: 10),
+                              Text('Random Color Change', style:Theme.of(context).textTheme.button)
+                            ],
+                          ),
                         ),
                       ],
                     );
@@ -150,8 +193,77 @@ class SearchCategory extends HookWidget {
       ),
     );
   }
-}
 
+  int _generateColor() => (Random().nextDouble() * 0xFFFFFF).toInt();
+
+  Widget _CategoryOptionButton({
+    required VoidCallback onEdit,
+    required VoidCallback onDelete,
+  }) {
+    return PopupMenuButton(
+      icon: Icon(Icons.more_horiz),
+      itemBuilder: (context) => <PopupMenuEntry>[
+        PopupMenuItem(
+          child: ListTile(
+            leading: Icon(Icons.edit),
+            title: Text(
+              'Edit',
+              style: Theme.of(context).textTheme.button,
+            ),
+            contentPadding: EdgeInsets.zero,
+            onTap: onEdit,
+          ),
+        ),
+        PopupMenuItem(
+          child: ListTile(
+            leading: Icon(Icons.delete),
+            title: Text(
+              'Delete',
+              style: Theme.of(context).textTheme.button,
+            ),
+            contentPadding: EdgeInsets.zero,
+            onTap: () => showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                content:
+                    Text('This can affect to whole data using this category.'
+                        ' Are you sure to delete this category?'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('CANCEL'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      onDelete();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Future<void> _onCreateOrUpdate(BuildContext context, Category? cat) async {
+    if (cat != null && cat.name.isNotEmpty) {
+      try {
+        final newCategory = await context.read(categoryListCache).create(cat);
+        Navigator.pop(context, newCategory);
+      } catch (e, _) {
+        await context.read(categoryListCache).update(cat);
+        context.read(budgetListCache).onCategoryUpdated(cat);
+        Navigator.pop(context, cat);
+      }
+    }
+  }
+}
 
 class ColorPicker extends StatefulWidget {
   final ValueChanged<Color> onChangeColor;
@@ -176,20 +288,6 @@ class _ColorPickerState extends State<ColorPicker> {
     Color.fromARGB(153, 0, 0, 255),
     Color.fromARGB(153, 128, 0, 255),
     Color.fromARGB(153, 255, 0, 255),
-
-    // Color.fromARGB(255, 255, 0, 0),
-    // Color.fromARGB(255, 255, 128, 0),
-    // Color.fromARGB(255, 255, 255, 0),
-    // Color.fromARGB(255, 255, 255, 0),
-    // Color.fromARGB(255, 128, 255, 0),
-    // Color.fromARGB(255, 0, 255, 0),
-    // Color.fromARGB(255, 0, 255, 128),
-    // Color.fromARGB(255, 0, 255, 255),
-    // Color.fromARGB(255, 0, 128, 255),
-    // Color.fromARGB(255, 0, 0, 255),
-    // Color.fromARGB(255, 128, 0, 255),
-    // Color.fromARGB(255, 255, 0, 255),
-    // Color.fromARGB(255, 255, 0, 128)
   ];
 
   double _width = 0.0;
@@ -223,18 +321,18 @@ class _ColorPickerState extends State<ColorPicker> {
       int redValue = _colors[index].red == _colors[index + 1].red
           ? _colors[index].red
           : (_colors[index].red +
-          (_colors[index + 1].red - _colors[index].red) * remainder)
-          .round();
+                  (_colors[index + 1].red - _colors[index].red) * remainder)
+              .round();
       int greenValue = _colors[index].green == _colors[index + 1].green
           ? _colors[index].green
           : (_colors[index].green +
-          (_colors[index + 1].green - _colors[index].green) * remainder)
-          .round();
+                  (_colors[index + 1].green - _colors[index].green) * remainder)
+              .round();
       int blueValue = _colors[index].blue == _colors[index + 1].blue
           ? _colors[index].blue
           : (_colors[index].blue +
-          (_colors[index + 1].blue - _colors[index].blue) * remainder)
-          .round();
+                  (_colors[index + 1].blue - _colors[index].blue) * remainder)
+              .round();
       return Color.fromARGB(255, redValue, greenValue, blueValue);
     }
   }
@@ -246,7 +344,7 @@ class _ColorPickerState extends State<ColorPicker> {
         Row(
           children: [
             GestureDetector(
-              onTap: ()=>widget.onChangeColor(Colors.white),
+              onTap: () => widget.onChangeColor(Colors.white),
               child: Container(
                 width: 24,
                 height: 24,
@@ -287,7 +385,7 @@ class _ColorPickerState extends State<ColorPicker> {
               ),
             ),
             GestureDetector(
-              onTap: ()=>widget.onChangeColor(Colors.black),
+              onTap: () => widget.onChangeColor(Colors.black),
               child: Container(
                 width: 24,
                 height: 24,

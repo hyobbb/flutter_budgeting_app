@@ -17,6 +17,7 @@ class ExpenseScreen extends HookWidget {
   Widget build(BuildContext context) {
     final navigationIndex = useState(0);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Align(
           alignment: Alignment.centerLeft,

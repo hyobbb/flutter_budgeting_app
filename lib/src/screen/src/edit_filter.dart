@@ -32,6 +32,7 @@ class EditFilter extends HookWidget {
     final categories =
         BudgetFunction.groupByCategory(group[type] ?? []).keys.toList();
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Align(
           alignment: Alignment.centerLeft,
@@ -90,14 +91,11 @@ class EditFilter extends HookWidget {
 
   Widget _dateFilter() {
     final context = useContext();
+    final budgetList = useProvider(budgetListCache);
     final provider = useProvider(_currentFilter(type));
     final filter = useProvider(_currentFilter(type).state);
-    final data = BudgetFunction.applyFilter(
-        data: context.read(budgetListCache.state), filter: filter);
-    final start = filter.startDate != null && data.isNotEmpty
-        ? data.last.date
-        : DateTime.now();
-    final end = filter.endDate ?? DateTime.now();
+    final start = filter.startDate ?? budgetList.firstDate;
+    final end = filter.endDate ?? budgetList.lastDate;
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: InkWell(
@@ -108,8 +106,9 @@ class EditFilter extends HookWidget {
                 start: start,
                 end: end,
               ),
-              firstDate: data.isNotEmpty ? data.last.date : DateTime.now(),
-              lastDate: DateTime.now());
+              firstDate: budgetList.firstDate,
+              lastDate: budgetList.lastDate
+          );
 
           if (selected != null) {
             provider.setDate(start: selected.start, end: selected.end);

@@ -1,8 +1,7 @@
 import 'package:budgeting/src/model/model.dart';
-import 'package:budgeting/src/widget/src/search_category.dart';
+import 'package:budgeting/src/widget/widgets.dart';
 import 'package:budgeting/src/service/date_handler.dart';
 import 'package:budgeting/src/widget/src/category_tag.dart';
-import 'package:budgeting/src/widget/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -27,6 +26,7 @@ class EditData extends HookWidget {
       value.text = editingParam.value.toString();
     }, const []);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Align(
           alignment: Alignment.centerLeft,
@@ -71,8 +71,9 @@ class EditData extends HookWidget {
                 await budgetList.update(editingParam);
                 Navigator.pop(context);
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(AppLocalizations.of(context)!.invalidParameter)));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content:
+                        Text(AppLocalizations.of(context)!.invalidParameter)));
               }
             },
           )
@@ -107,13 +108,15 @@ class EditData extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Icon(Icons.description),
-          const SizedBox(width: 10),
+          const SizedBox(width: 20),
           Expanded(
             child: TextField(
                 controller: controller,
                 decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)!.titleHint, border: InputBorder.none),
+                    hintText: AppLocalizations.of(context)!.titleHint,
+                    border: InputBorder.none),
                 style: Theme.of(context).textTheme.headline5,
+                textCapitalization: TextCapitalization.sentences,
                 onSubmitted: (_) => FocusScope.of(context).nextFocus(),
                 onChanged: (title) =>
                     context.read(editingData(data)).setTitle(title)),
@@ -130,8 +133,8 @@ class EditData extends HookWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(Icons.euro),
-          const SizedBox(width: 10),
+          const Icon(Icons.attach_money),
+          const SizedBox(width: 20),
           Expanded(
             child: TextField(
               controller: controller,
@@ -160,7 +163,7 @@ class EditData extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Icon(Icons.calendar_today),
-          const SizedBox(width: 10),
+          const SizedBox(width: 20),
           Expanded(
             child: InkWell(
               onTap: () async {
@@ -191,35 +194,34 @@ class EditData extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Icon(Icons.category),
-          const SizedBox(width: 10),
-          HookBuilder(builder: (_) {
-            return CategoryTag(
-              state.category,
-              onTap: (_) {
-                showDialog(
-                  context: context,
-                  builder: (_) => SearchCategory(
-                    onDeleted: (Category value) async {
-                      await context.read(categoryListCache).remove(value.id!);
-                      context.read(editingData(data)).onDeleteCategory(value);
-                      context
-                          .read(budgetListCache)
-                          .onCategoryDeleted(value.id!);
-                    },
-                    onCreated: (Category value) async {
-                      await context.read(categoryListCache).update(value);
-                      context.read(editingData(data)).setCategory(context
-                          .read(categoryListCache)
-                          .getCategory(value.name));
-                    },
-                    onSelected: (Category? value) {
-                      context.read(editingData(data)).setCategory(value);
-                    },
-                  ),
-                );
-              },
-            );
-          }),
+          const SizedBox(width: 20),
+          HookBuilder(
+            builder: (_) {
+              return CategoryTag(
+                state.category,
+                onTap: (_) async {
+                  final selected = await showDialog(
+                    context: context,
+                    builder: (_) => SearchCategory(
+                      initialCategory: state.category,
+                      deleteCallback:
+                          context.read(editingData(data)).onDeleteCategory,
+                    ),
+                  );
+                  if (selected != null) {
+                    context.read(editingData(data)).setCategory(selected);
+                  }
+                },
+              );
+            },
+          ),
+          Expanded(child: Container()),
+          if (state.category != null)
+            IconButton(
+              onPressed: () =>
+                  context.read(editingData(data)).setCategory(null),
+              icon: Icon(Icons.remove_circle),
+            )
         ],
       ),
     );
@@ -231,23 +233,16 @@ class EditData extends HookWidget {
     return Container(
       height: 60,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(Icons.monetization_on_outlined),
-          const SizedBox(width: 10),
-          Row(
-            children: [
-              Checkbox(
-                value: state.cash,
-                onChanged: (value) {
-                  if (value != null) {
-                    context.read(editingData(data)).setIfCash(value);
-                  }
-                },
-              ),
-              Text(AppLocalizations.of(context)!.cashHint)
-            ],
+          Checkbox(
+            value: state.cash,
+            onChanged: (value) {
+              if (value != null) {
+                context.read(editingData(data)).setIfCash(value);
+              }
+            },
           ),
+          Text(AppLocalizations.of(context)!.cashHint)
         ],
       ),
     );

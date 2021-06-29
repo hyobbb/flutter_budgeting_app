@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:budgeting/src/model/model.dart';
+import 'package:budgeting/src/providers/providers.dart';
 import 'package:budgeting/src/providers/src/locale_provider.dart';
 import 'package:budgeting/src/service/budget_function.dart';
 import 'package:budgeting/src/service/date_handler.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_loclizations.dart';
+/*
 
 class PieChartView extends HookWidget {
   final Map<Category?, double> data;
@@ -18,6 +20,7 @@ class PieChartView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locale = useProvider(localeProvider);
     double totalSum = 0.0;
     List<Category?> keys = [];
     List<double> values = [];
@@ -33,84 +36,183 @@ class PieChartView extends HookWidget {
       values = items.values.toList();
       return null;
     }, [data]);
-    return SingleChildScrollView(
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Stack(
           children: [
-            Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(28.0),
-                  child: Text(
-                    'Total: ' + totalSum.toString() + ' ‎€',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff000000),
-                    ),
-                  ),
+            Padding(
+              padding: const EdgeInsets.all(28.0),
+              child: Text(
+                'Total: ${locale.printIncome(totalSum)}',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xff000000),
                 ),
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: PieChart(
-                    PieChartData(
-                      borderData: FlBorderData(
-                        show: false,
-                      ),
-                      sectionsSpace: 0,
-                      centerSpaceRadius: 20,
-                      sections: List.generate(keys.length, (i) {
-                        final double fontSize = 16;
-                        final double radius = 100;
-                        return PieChartSectionData(
-                          color: keys[i] == null
-                              ? Colors.white.withOpacity(0.8)
-                              : Color(keys[i]!.color).withOpacity(0.8),
-                          value: values[i],
-                          title:
-                              '${(values[i]/totalSum * 100).toStringAsFixed(1)}%',
-                          radius: radius,
-                          titleStyle: TextStyle(
-                              fontSize: fontSize,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff000000)),
-                        );
-                      }),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                child: Column(
-                  children: List.generate(
-                    keys.length,
-                    (i) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          CategoryTag(keys[i]),
-                          Expanded(child: Container()),
-                          const SizedBox(width: 20),
-                          Text(values[i].toString() + ' ‎€'),
-                          const SizedBox(width: 20),
-                          Text((values[i] / totalSum * 100).toStringAsFixed(1) +
-                              ' %'),
-                        ],
-                      ),
-                    ),
-                  ).toList(),
+            AspectRatio(
+              aspectRatio: 1,
+              child: PieChart(
+                PieChartData(
+                  borderData: FlBorderData(
+                    show: false,
+                  ),
+                  sectionsSpace: 0,
+                  centerSpaceRadius: 20,
+                  sections: List.generate(keys.length, (i) {
+                    final double fontSize = 16;
+                    final double radius = 100;
+                    return PieChartSectionData(
+                      color: keys[i] == null
+                          ? Colors.white.withOpacity(0.8)
+                          : Color(keys[i]!.color).withOpacity(0.8),
+                      value: values[i],
+                      title:locale.printPercentage(values[i] / totalSum),
+                      radius: radius,
+                      titleStyle: TextStyle(
+                          fontSize: fontSize,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xff000000)),
+                    );
+                  }),
                 ),
               ),
             ),
           ],
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28.0),
+          child: Column(
+            children: List.generate(
+              keys.length,
+              (i) => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    CategoryTag(keys[i]),
+                    Expanded(child: Container()),
+                    const SizedBox(width: 20),
+                    Text(locale.printIncome(values[i])),
+                    const SizedBox(width: 20),
+                    Text(locale.printPercentage(values[i] / totalSum)),
+                  ],
+                ),
+              ),
+            ).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+*/
+
+class PieChartView extends HookWidget {
+  final Map<Category?, double> data;
+
+  const PieChartView(this.data);
+
+  @override
+  Widget build(BuildContext context) {
+    final locale = useProvider(localeProvider);
+    double totalSum = 0.0;
+    List<Category?> keys = [];
+    List<double> values = [];
+    useEffect(() {
+      final sortedKeys = data.keys.toList()
+        ..sort((k1, k2) => data[k2]?.compareTo(data[k1] ?? 0) ?? 0);
+      final LinkedHashMap<Category?, double> items = LinkedHashMap.fromIterable(
+          sortedKeys,
+          key: (k) => k,
+          value: (k) => data[k] ?? 0);
+      totalSum = items.values.reduce((value, element) => value + element);
+      keys = items.keys.toList();
+      values = items.values.toList();
+      return null;
+    }, [data]);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(28.0),
+              child: Text(
+                'Total: ${locale.printIncome(totalSum)}',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xff000000),
+                ),
+              ),
+            ),
+            AspectRatio(
+              aspectRatio: 1,
+              child: PieChart(
+                PieChartData(
+                  borderData: FlBorderData(
+                    show: false,
+                  ),
+                  sectionsSpace: 0,
+                  centerSpaceRadius: 20,
+                  sections: List.generate(keys.length, (i) {
+                    final double fontSize = 16;
+                    final double radius = 100;
+                    return PieChartSectionData(
+                      color: keys[i] == null
+                          ? Colors.white.withOpacity(0.8)
+                          : Color(keys[i]!.color).withOpacity(0.8),
+                      value: values[i],
+                      title: locale.printPercentage(values[i] / totalSum),
+                      radius: radius,
+                      titleStyle: TextStyle(
+                          fontSize: fontSize,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xff000000)),
+                    );
+                  }),
+                ),
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28.0),
+            child: ListView.builder(
+              itemCount: keys.length,
+              itemBuilder: (context, i) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      CategoryTag(
+                        keys[i],
+                        onTap: (cat) {
+                          showDialog(
+                            context: context,
+                            builder: (_) =>
+                                SearchCategory(initialCategory: cat),
+                          );
+                        },
+                      ),
+                      Expanded(child: Container()),
+                      const SizedBox(width: 20),
+                      Text(locale.printIncome(values[i])),
+                      const SizedBox(width: 20),
+                      Text(locale.printPercentage(values[i] / totalSum)),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -136,7 +238,7 @@ class BalanceBar extends HookWidget {
       child: Column(
         children: [
           Text(
-            'Total Balance: ' + locale.printIncome(balance),
+            'Total Balance: ${locale.printIncome(balance)}',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,

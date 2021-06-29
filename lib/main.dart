@@ -36,7 +36,7 @@ class MyApp extends HookWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       locale: locale,
-      initialRoute: HomeScreen.route,
+      initialRoute: ExpenseScreen.route,
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case HomeScreen.route:
